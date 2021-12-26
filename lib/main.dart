@@ -25,7 +25,7 @@ class _MyHomePageState extends State<MyHomePage> {
       builder: (context, gameState, child) {
         return Center(
           child: ListView.builder(
-            itemCount: gameState.getElementCount(),
+            itemCount: gameState.elementCount,
             itemBuilder: (context, index) {
               return Column(children: <Widget>[
                 GestureDetector(
@@ -33,16 +33,12 @@ class _MyHomePageState extends State<MyHomePage> {
                   child: Padding(
                     padding: const EdgeInsets.only(bottom: 10),
                     child: Container(
-                        color: gameState.getDarkEls().contains(index)
-                            ? Colors.grey.shade700
-                            : gameState.getGreenEls().contains(index)
-                                ? Colors.green
-                                : Colors.grey,
+                        color: gameState.getBlockColor(index),
                         width: 150,
                         height: 100,
                         child: Center(
                             child: Text(
-                          'Element $index',
+                          gameState.getBlockText(index),
                           style: const TextStyle(
                               color: Colors.black,
                               fontSize: 30,

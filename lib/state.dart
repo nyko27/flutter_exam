@@ -4,36 +4,55 @@ import 'dart:math';
 class GameState extends ChangeNotifier {
   static final int _elementCount = 5 + Random().nextInt(5);
   int _chosen = Random().nextInt(_elementCount);
-  List<int> _darkElements = [];
-  List<int> _greenElements = [];
+  int? _darkElement;
+  final List<int> _greenElements = [];
+  List<int> _greyElements = List<int>.generate(_elementCount, (i) => i);
+
+  int get elementCount => _elementCount;
 
   void press(int pressedElement) {
-    if (_darkElements.contains(pressedElement) ||
-        _greenElements.contains(pressedElement)) {
-    } else {
+    if (_greyElements.contains(pressedElement)) {
+      if (_greenElements.length == elementCount - 1) {
+        _greyElements = List<int>.generate(_elementCount, (i) => i);
+        _greenElements.clear();
+        _darkElement = null;
+        notifyListeners();
+        return;
+      }
+
+      _greyElements.remove(pressedElement);
+
       if (pressedElement == _chosen) {
         _greenElements.add(pressedElement);
       } else {
-        _darkElements.add(pressedElement);
+        if (_darkElement != null) {
+          _greyElements.add(_darkElement!);
+        }
+
+        _darkElement = pressedElement;
       }
+
+      try {
+        _chosen = _greyElements[Random().nextInt(_greyElements.length)];
+      } catch (e) {
+        _chosen = _darkElement!;
+        _greyElements.add(_darkElement!);
+        _darkElement = null;
+      }
+
+      notifyListeners();
     }
-    _chosen = Random().nextInt(_elementCount);
-    notifyListeners();
   }
 
-  bool isSpecial(int el) {
-    return el == _chosen;
+  Color getBlockColor(int element) {
+    return _darkElement == element
+        ? Colors.grey.shade700
+        : _greenElements.contains(element)
+            ? Colors.green
+            : Colors.grey;
   }
 
-  List getGreenEls() {
-    return _greenElements;
-  }
-
-  List getDarkEls() {
-    return _darkElements;
-  }
-
-  int getElementCount() {
-    return _elementCount;
+  String getBlockText(int element) {
+    return _darkElement == element ? "" : 'Element ${element + 1}';
   }
 }
